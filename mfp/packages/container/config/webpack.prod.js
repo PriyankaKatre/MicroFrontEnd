@@ -1,37 +1,28 @@
-
+import { merge } from 'webpack-merge';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import ModuleFederationPlugin from 'webpack/lib/container/ModuleFederationPlugin.js'
+import commonConfig from './webpack.common.js';
+import packageJson from '../package.json' with { type: "json" };
 
-export default {
-    mode: 'development',
-    devServer: {
-        port: '8080'
+const domain = process.env.PRODUCTION_DOMAIN
+const prodConfig = {
+    mode: 'production',
+    output: {
+        filename: '[name].[contenthash].js'
     },
     plugins: [
-         new ModuleFederationPlugin({
+        new ModuleFederationPlugin({
             name: 'container',
             remotes: {
-                products: 'products@http://localhost:8081/remoteEntry.js',
-                cart: 'myCart@http://localhost:8082/remoteEntry.js'
-            }
+                marketing: `marketing@${domain}/marketing/remoteEntry.js`,
+                //cart: 'myCart@http://localhost:8082/remoteEntry.js'
+            },
+            shared: packageJson.dependencies,
         }),
-        new HtmlWebpackPlugin({
-            template: './public/index.html'
-        })
-  ],
-  module: {
-    rules: [
-      {
-        test: /\.m?js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-react', '@babel/preset-env'],
-            plugins: ['@babel/plugin-transform-runtime'] 
-          }
-        }
-      }
-    ]
-  }
+      new HtmlWebpackPlugin({
+        template: './public/index.html'
+      })
+    ],
 }
+
+export default merge(commonConfig, prodConfig)
