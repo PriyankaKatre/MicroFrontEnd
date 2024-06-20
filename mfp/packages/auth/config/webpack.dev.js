@@ -7,26 +7,26 @@ console.log('packageJson', packageJson)
 const devConfig = {
     mode: 'development',
     output: {
-        publicPath: "http://localhost:8081/"
+        publicPath: "http://localhost:8082/"
     },
     devServer: {
-      port: '8081',
+      port: '8082',
       historyApiFallback: {
         index: '/index.html'
       }
     },
     plugins: [
         new ModuleFederationPlugin({
-            name: 'marketing',
+            name: 'auth',
             filename: 'remoteEntry.js',
             exposes: {
-                './marketingApp': './src/bootstrap.js'
+              './authApp': './src/bootstrap.js'
             },
             shared: packageJson.dependencies,
         }),
-      new HtmlWebpackPlugin({
-        template: './public/index.html'
-      })
+        new HtmlWebpackPlugin({
+            template: './public/index.html'
+        })
   ],
 }
 
